@@ -2,6 +2,15 @@
 #include <avr/io.h>
 #include <avr/interrupt.h>
 
+#if defined __AVR_ATmega324PB__
+#define UCSZ00 UCSZ0
+#define UCSZ01 UCSZ1
+#define RXCIE0 RXCIE
+#define RXEN0  RXEN
+#define TXEN0  TXEN
+#define UDRE0  UDRE
+#endif
+
 #include "uart.h"
 
 #define UART_TX_USE_IRQ 0
@@ -38,7 +47,7 @@ void uart_init(void)
 //! UART receive interrupt handler
 //ISR(SIG_USART_RECV)
 
-#if defined __AVR_ATmega644__ || defined __AVR_ATmega644A__ || defined __AVR_ATmega644P__ || defined __AVR_ATmega644PA__
+#if defined __AVR_ATmega644__ || defined __AVR_ATmega644A__ || defined __AVR_ATmega644P__ || defined __AVR_ATmega644PA__ || defined __AVR_ATmega324PA__ || defined __AVR_ATmega324PB__
 ISR(USART0_RX_vect)
 #else
 ISR(USART_RX_vect)
@@ -73,7 +82,7 @@ static volatile unsigned char TxTail = 0;
 #define TxLength   (unsigned char)(TxHead - TxTail)
 
 //! UDRE handler
-#if defined __AVR_ATmega644__ || defined __AVR_ATmega644A__ || defined __AVR_ATmega644P__ || defined __AVR_ATmega644PA__
+#if defined __AVR_ATmega644__ || defined __AVR_ATmega644A__ || defined __AVR_ATmega644P__ || defined __AVR_ATmega644PA__ || defined __AVR_ATmega324PA__ || defined __AVR_ATmega324PB__
 ISR(USART0_UDRE_vect)
 #else
 ISR(USART_UDRE_vect)

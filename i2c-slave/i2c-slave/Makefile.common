@@ -9,6 +9,7 @@ AVRDUDE_DRAGONHVSP := avrdude -c dragon_hvsp -P usb
 AVRDUDE_USBASP     := avrdude -c usbasp -P usb
 AVRDUDE_AVRISP2    := avrdude -c avrispmkii -P usb
 AVRDUDE_ARDUINO    := avrdude -F -c arduino -b 57600 -P /dev/ttyUSB0
+AVRDUDE_XPRO       := avrdude -c xplainedpro
 
 CC           := avr-gcc
 OBJCOPY      := avr-objcopy

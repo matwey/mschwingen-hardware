@@ -23,6 +23,14 @@
  * PD0: UART TXD (D0 on arduino, optional)
  * PD1: UART RXD (D1 on arduino, optional)
  *
+ * ATmega324PB-XPRO:
+ * ATmega324PB with 16.0MHz crystal
+ * PC7: LED (active low)
+ * PE5, PC6: SDA (Ext1.11, Ext3.11 connected to Ext3.9)
+ * PE6, PB1: SCL (Ext1.12, Ext3.12 connected to Ext3.10)
+ * PD0: UART TXD (Ext1.13)
+ * PD1: UART RXD (Ext1.14)
+ *
  * the device occupies 16 consecutive addresses, with the default base
  * address being 0x60.
  *
@@ -79,6 +87,14 @@
 #include <util/twi.h>
 #include <stdbool.h>
 
+#if defined __AVR_ATmega324PB__
+#define TWCR  TWCR1
+#define TWSR  TWSR1
+#define TWDR  TWDR1
+#define TWAR  TWAR1
+#define TWAMR TWAMR1
+#endif
+
 typedef struct
 {
   unsigned int bit0:1;
@@ -92,6 +108,18 @@ typedef struct
 } _io_reg;
 #define REGISTER_BIT(rg,bt) ((volatile _io_reg*)&rg)->bit##bt
 
+#if defined __AVR_ATmega324PB__
+#define LED1 		REGISTER_BIT(PORTC,7)
+#define SCL 		REGISTER_BIT(PORTE,6)
+#define SDA 		REGISTER_BIT(PORTE,5)
+
+#define SCL2_PORT 	REGISTER_BIT(PORTB,1)
+#define SDA2_PORT 	REGISTER_BIT(PORTC,6)
+#define SCL2_DDR 	REGISTER_BIT(DDRB,1)
+#define SDA2_DDR	REGISTER_BIT(DDRC,6)
+#define SCL2_PIN 	REGISTER_BIT(PINB,1)
+#define SDA2_PIN	REGISTER_BIT(PINC,6)
+#else
 #define LED1 		REGISTER_BIT(PORTB,5)
 #define SCL 		REGISTER_BIT(PORTC,5)
 #define SDA 		REGISTER_BIT(PORTC,4)
@@ -102,6 +130,7 @@ typedef struct
 #define SDA2_DDR	REGISTER_BIT(DDRC,2)
 #define SCL2_PIN 	REGISTER_BIT(PINC,3)
 #define SDA2_PIN	REGISTER_BIT(PINC,2)
+#endif
 
 static FILE mystdio = FDEV_SETUP_STREAM(uart_putchar, uart_getchar, _FDEV_SETUP_RW);
 
@@ -247,6 +276,18 @@ static void twi_handler(void) {
 
 int main(void)
 {
+#if defined __AVR_ATmega324PB__
+  // enable pullups / set initial pin states
+  PORTB = 0x00;
+  PORTC = _BV(PC7);
+  PORTD = 0x00;
+  PORTE = _BV(PE5) | _BV(PE6);
+  // set pins to output
+  DDRB = 0;
+  DDRC = _BV(PC7);
+  DDRD = 0;
+  DDRE = 0;
+#else
   // enable pullups / set initial pin states
   PORTB = _BV(PB5);
   PORTC = _BV(PC4) | _BV(PC5);
@@ -255,6 +296,7 @@ int main(void)
   DDRB = _BV(PB5);
   DDRC = 0;
   DDRD = 0;
+#endif
 
   LED1 = 1;
   SCL2_PORT = 0;

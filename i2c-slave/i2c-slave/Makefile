@@ -1,10 +1,29 @@
 #PROGRAM ?= i2cslave_m328
-PROGRAM ?= i2cslave_m88
+#PROGRAM ?= i2cslave_m88
+PROGRAM ?= i2cslave_m324
 
 all: $(PROGRAM).hex
 
 CFLAGS_OPT = -Os -flto
 LDFLAGS_OPT = -Os -flto
+
+FREQ_i2cslave_m324	:= 16000000
+MCU_i2cslave_m324	:= atmega324pb
+BAUD_i2cslave_m324	:= 19200
+AVRDUDE_i2cslave_m324   = $(AVRDUDE_XPRO)
+LDFLAGS_i2cslave_m324   =
+CFLAGS_i2cslave_m324   +=
+
+i2cslave_m324.elf: uart2.o i2cslave.o
+	$(CC) -o $@ $(LDFLAGS) -Wl,-Map,$*.map $^ $(EXTRA_LIBS)
+	$(SIZE) $@
+
+FUSE_L_i2cslave_m324	:= 0xEF
+FUSE_H_i2cslave_m324	:= 0x99
+FUSE_E_i2cslave_m324	:= 0x0F
+
+
+#############################################################################
 
 FREQ_i2cslave_m328	:= 8000000
 MCU_i2cslave_m328	:= atmega328p
